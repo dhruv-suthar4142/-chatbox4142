@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AVDS Login</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="login">
+  <h2>Login</h2>
+
+  <input type="text" id="username" placeholder="Username">
+  <input type="tel" id="number" placeholder="11-digit Number" maxlength="11">
+  <input type="password" id="dvc" placeholder="8-digit DVC" maxlength="8">
+
+  <button onclick="login()">Login</button>
+
+  <p id="error"></p>
+</div>
+
+<script>
+function login() {
+  const username = document.getElementById("username").value.trim();
+  const number = document.getElementById("number").value.trim();
+  const dvc = document.getElementById("dvc").value.trim();
+  const error = document.getElementById("error");
+
+  // Validation
+  if (!username || !number || !dvc) {
+    error.textContent = "All fields are required!";
+    return;
+  }
+
+  if (number.length !== 11) {
+    error.textContent = "Number must be 11 digits!";
+    return;
+  }
+
+  if (dvc.length !== 8) {
+    error.textContent = "DVC must be 8 digits!";
+    return;
+  }
+
+  // Save user in localStorage
+  localStorage.setItem("user", username);
+
+  // Redirect to chat page
+  window.location.href = "chat.html"; // change if your file name is different
+}
+</script>
+
+</body>
+</html>
