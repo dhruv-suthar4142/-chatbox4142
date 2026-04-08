@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f5f7fa;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    #chatBox {
+      border: 1px solid #ccc;
+      height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: white;
+    }
+
+    button {
+      margin: 3px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    #currentChat {
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    input {
+      padding: 8px;
+      width: 70%;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 id="welcome"></h2>
+
+<button onclick="logout()">Logout</button>
+
+<h3>Group Chats</h3>
+<button onclick="openChat('group','AVDS')">AVDS</button>
+<button onclick="openChat('group','AVDS_staff')">AVDS Staff</button>
+
+<h3>Private Chats</h3>
+<button onclick="openChat('private','Aarav_Sanchit')">Aarav</button>
+<button onclick="openChat('private','Vaibhav_Sanchit')">Vaibhav</button>
+<button onclick="openChat('private','Dhruv_Sanchit')">Dhruv</button>
+<button onclick="openChat('private','lakshyraj')">Lakshyraj</button>
+<button onclick="openChat('private','Preet_Sanchit')">Preet</button>
+
+<h3 id="currentChat">No chat selected</h3>
+
+<div id="chatBox"></div>
+
+<input type="text" id="msgInput" placeholder="Type a message">
+<button onclick="sendMessage()">Send</button>
+<button onclick="clearChat()">Clear Chat</button>
+
+<script>
+// Redirect if not logged in
+const username = localStorage.getItem("user");
+if (!username) {
+  window.location.href = "index.html";
+}
+
+// Show username
+document.getElementById("welcome").textContent = "Welcome " + username;
+
+// Chat state
+let currentChatId = null;
+let currentChatType = null;
+
+// Open chat
+function openChat(type, id) {
+  currentChatType = type;
+  currentChatId = id;
+
+  document.getElementById("currentChat").textContent =
+    type === 'group' ? `Group Chat: ${id}` : `Private Chat: ${id}`;
+
+  loadMessages();
+}
+
+// Load messages
+function loadMessages() {
+  const chatBox = document.getElementById("chatBox");
+  chatBox.innerHTML = '';
+
+  if (!currentChatId) return;
+
+  const messages = JSON.parse(localStorage.getItem(currentChatId)) || [];
+
+  let lastDate = "";
+
+  messages.forEach(m => {
+
+    // Date separator
+    if (m.date !== lastDate) {
+      const dateDiv = document.createElement("div");
+      dateDiv.style.textAlign = "center";
+      dateDiv.style.margin = "10px 0";
+      dateDiv.innerHTML = `<small>--- ${m.date} ---</small>`;
+      chatBox.appendChild(dateDiv);
+      lastDate = m.date;
+    }
+
+    // Message
+    const div = document.createElement("div");
+    div.textContent = `${m.user}: ${m.text} (${m.time})`;
+
+    chatBox.appendChild(div);
+  });
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Send message
+function sendMessage() {
+  if (!currentChatId) {
+    alert("Select a chat first");
+    return;
+  }
+
+  const input = document.getElementById("msgInput");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  const now = new Date();
+
+  const time = now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  const date = now.toLocaleDateString();
+
+  const message = {
+    user: username,
+    text: text,
+    time: time,
+    date: date
+  };
+
+  const messages = JSON.parse(localStorage.getItem(currentChatId)) || [];
+
+  messages.push(message);
+
+  localStorage.setItem(currentChatId, JSON.stringify(messages));
+
+  input.value = '';
+
+  loadMessages();
+}
+
+// Enter key support
+document.getElementById("msgInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
+
+// Auto refresh
+setInterval(() => {
+  if (currentChatId) loadMessages();
+}, 1000);
+
+// Logout
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+// Clear chat
+function clearChat() {
+  if (!currentChatId) return;
+  localStorage.removeItem(currentChatId);
+  loadMessages();
+}
+</script>
+
+</body>
+</html>
